@@ -20,13 +20,11 @@ func main() {
 	defer dataset.Close()
 	xSize := dataset.RasterXSize()
 	ySize := dataset.RasterYSize()
-	log.Printf("GeoTIFF info: %dx%d pixels, %d bands", xSize, ySize)
+	log.Printf("GeoTIFF info: %dx%d pixels", xSize, ySize)
 
-	// Минимальный размер тайла
 	const tileSize = 256
 
 	http.HandleFunc("/tile", func(w http.ResponseWriter, r *http.Request) {
-		// 2. Парсим параметры
 		z, err := strconv.Atoi(r.URL.Query().Get("z"))
 		if err != nil || z < 0 {
 			http.Error(w, "Invalid z parameter", http.StatusBadRequest)
@@ -46,7 +44,7 @@ func main() {
 		}
 
 		img := render.Tile(&dataset, tileSize, x, y, z, xSize, ySize)
-		// 6. Отдаем PNG
+
 		w.Header().Set("Content-Type", "image/png")
 		if err := png.Encode(w, img); err != nil {
 			log.Printf("PNG encode error: %v", err)
