@@ -1,0 +1,12 @@
+github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/dhconnelly/rtreego v1.2.0 h1:LWhGPhw+iGuhg8hmHA/H8WV60qKtzecOjii0FMevGlk=
+github.com/dhconnelly/rtreego v1.2.0/go.mod h1:SDozu0Fjy17XH1svEXJgdYq8Tah6Zjfa/4Q33Z80+KM=
+github.com/gden173/geotiff v0.0.0-20240912224008-f9783b944902 h1:UR3HsDlgdFtlZHeXRBPB1alLZjNkvIQxjaQ41p8iaUY=
+github.com/gden173/geotiff v0.0.0-20240912224008-f9783b944902/go.mod h1:AKubHTT88YbSs0L8J5g9B9q8wHK6HW9Clv125U/mpLk=
+github.com/lukeroth/gdal v0.0.0-20240301124940-d4ff2229365e h1:ih9r73dwd1JGB24sWU4I1TgGdljjR0Suh08rDS8CeRU=
+github.com/lukeroth/gdal v0.0.0-20240301124940-d4ff2229365e/go.mod h1:u/R3dIULVNb+dWMOvaoa5GxHgN1rJi+TUKUlTOqU/MY=
+github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+github.com/stretchr/testify v1.7.2/go.mod h1:R6va5+xMeoiuVRoj+gSkQ7d3FALtqAAGI1FQKckRals=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
