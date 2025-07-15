@@ -6,7 +6,7 @@ import (
 	"github.com/lukeroth/gdal"
 )
 
-func Tile(dataset *gdal.Dataset, tileSize, x, y, z, xSize, ySize int) *image.RGBA {
+func Tile(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) *image.RGBA {
 
 	var img *image.RGBA
 	scale := 1 << z

@@ -1,1 +1,2 @@
-resourse/map/*
+/resource/map/*
+!resource/map/.gitkeep

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"geoserver/pkg/loader"
 	"geoserver/pkg/render"
 
@@ -17,9 +18,10 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer dataset.Close()
 	xSize := dataset.RasterXSize()
 	ySize := dataset.RasterYSize()
-	log.Printf("GeoTIFF info: %dx%d pixels", xSize, ySize)
+	fmt.Printf("GeoTIFF info: %dx%d pixels", xSize, ySize)
 
 	http.HandleFunc("/tile", func(w http.ResponseWriter, r *http.Request) {
 		z, err := strconv.Atoi(r.URL.Query().Get("z"))
@@ -39,9 +41,7 @@ func main() {
 			http.Error(w, "Invalid y parameter", http.StatusBadRequest)
 			return
 		}
-
-		img := render.Tile(&dataset, tileSize, x, y, z, xSize, ySize)
-
+		img := render.Tile(dataset, tileSize, x, y, z, xSize, ySize)
 		w.Header().Set("Content-Type", "image/png")
 		if err := png.Encode(w, img); err != nil {
 			log.Printf("PNG encode error: %v", err)
