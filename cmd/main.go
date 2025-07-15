@@ -1,28 +1,25 @@
 package main
 
 import (
+	"geoserver/pkg/loader"
 	"geoserver/pkg/render"
 
 	"image/png"
 	"log"
 	"net/http"
 	"strconv"
-
-	"github.com/lukeroth/gdal"
 )
 
+const tileSize = 256
+
 func main() {
-	// 1. Открываем GeoTIFF
-	dataset, err := gdal.Open("../resourse/map/NE1_LR_LC.tif", gdal.ReadOnly)
+	dataset, err := loader.GeoTiff()
 	if err != nil {
-		log.Fatal("Failed to open GeoTIFF:", err)
+		panic(err.Error())
 	}
-	defer dataset.Close()
 	xSize := dataset.RasterXSize()
 	ySize := dataset.RasterYSize()
 	log.Printf("GeoTIFF info: %dx%d pixels", xSize, ySize)
-
-	const tileSize = 256
 
 	http.HandleFunc("/tile", func(w http.ResponseWriter, r *http.Request) {
 		z, err := strconv.Atoi(r.URL.Query().Get("z"))

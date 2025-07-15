@@ -10,11 +10,11 @@ var (
 	geoDataset *gdal.Dataset // GeoTIFF-файл
 )
 
-func LoadByGdall() {
+func GeoTiff() (gdal.Dataset, error) {
 	dataset, err := gdal.Open("../resourse/map/NE1_LR_LC.tif", gdal.ReadOnly)
 	if err != nil {
-		log.Fatal("Ошибка загрузки GeoTIFF:", err)
+		log.Fatal("Failed to open GeoTIFF:", err)
 	}
-	geoDataset = &dataset
-	_ = geoDataset.GeoTransform()
+	defer dataset.Close()
+	return dataset, err
 }
