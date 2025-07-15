@@ -5,6 +5,8 @@ github.com/gden173/geotiff v0.0.0-20240912224008-f9783b944902 h1:UR3HsDlgdFtlZHe
 github.com/gden173/geotiff v0.0.0-20240912224008-f9783b944902/go.mod h1:AKubHTT88YbSs0L8J5g9B9q8wHK6HW9Clv125U/mpLk=
 github.com/lukeroth/gdal v0.0.0-20240301124940-d4ff2229365e h1:ih9r73dwd1JGB24sWU4I1TgGdljjR0Suh08rDS8CeRU=
 github.com/lukeroth/gdal v0.0.0-20240301124940-d4ff2229365e/go.mod h1:u/R3dIULVNb+dWMOvaoa5GxHgN1rJi+TUKUlTOqU/MY=
+github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 h1:zYyBkD/k9seD2A7fsi6Oo2LfFZAehjjQMERAvZLEDnQ=
+github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646/go.mod h1:jpp1/29i3P1S/RLdc7JQKbRpFeM1dOBd8T9ki5s+AY8=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.2/go.mod h1:R6va5+xMeoiuVRoj+gSkQ7d3FALtqAAGI1FQKckRals=

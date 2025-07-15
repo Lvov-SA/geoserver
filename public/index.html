@@ -15,10 +15,10 @@
 
     <script>
         // Инициализация карты (центр - Москва, zoom 10)
-        const map = L.map('map').setView([55.75, 37.61], 10);
+        const map = L.map('map').setView([0, 0], 0);
 
         // Добавляем слой с вашими тайлами
-        L.tileLayer('http://localhost:8080/tiles/{z}/{x}/{y}.png', {
+        L.tileLayer('http://localhost:8080/tile?z={z}&x={x}&y={y}', {
             minZoom: 0,
             maxZoom: 18,
             attribution: 'Тайловый сервис на Go'

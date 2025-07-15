@@ -14,7 +14,7 @@ func Load() {
 	}
 	defer f.Close()
 
-	// read the geotiff
+	// read the geotiffPinned
 	gtiff, err := geotiff.Read(f)
 	if err != nil {
 		panic(err)
