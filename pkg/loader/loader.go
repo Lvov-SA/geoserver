@@ -6,10 +6,6 @@ import (
 	"github.com/lukeroth/gdal"
 )
 
-var (
-	geoDataset *gdal.Dataset // GeoTIFF-файл
-)
-
 func GeoTiff() (gdal.Dataset, error) {
 	dataset, err := gdal.Open("../resourse/map/NE1_LR_LC.tif", gdal.ReadOnly)
 	if err != nil {
