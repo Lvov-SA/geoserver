@@ -17,7 +17,13 @@ func main() {
 		panic(err.Error())
 	}
 
-	fmt.Printf("GeoTIFF info: %dx%d pixels", loader.Dataset.RasterXSize(), loader.Dataset.RasterXSize())
+	fmt.Printf(
+		"GeoTIFF info: %dx%d pixels, bands count: %v",
+		loader.Dataset.RasterXSize(),
+		loader.Dataset.RasterXSize(),
+		loader.Dataset.RasterCount(),
+	)
+	fmt.Println()
 	http.HandleFunc("/", handlers.IndexHandler)
 	http.HandleFunc("/image-info", handlers.ImageInfoHandler)
 	http.HandleFunc("/tile", handlers.TileHandler)
