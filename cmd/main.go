@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"geoserver/pkg/loader"
 	"geoserver/pkg/render"
+	"html/template"
 
 	"image/png"
 	"log"
@@ -22,7 +24,19 @@ func main() {
 	xSize := dataset.RasterXSize()
 	ySize := dataset.RasterYSize()
 	fmt.Printf("GeoTIFF info: %dx%d pixels", xSize, ySize)
+	http.HandleFunc("/", viewHandler)
+	http.HandleFunc("/image-info", func(w http.ResponseWriter, r *http.Request) {
+		info := struct {
+			Width  int `json:"width"`
+			Height int `json:"height"`
+		}{
+			Width:  xSize,
+			Height: ySize,
+		}
 
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(info)
+	})
 	http.HandleFunc("/tile", func(w http.ResponseWriter, r *http.Request) {
 		z, err := strconv.Atoi(r.URL.Query().Get("z"))
 		if err != nil || z < 0 {
@@ -51,4 +65,12 @@ func main() {
 	log.Println("Server started at :8080")
 	log.Println("Access example: http://localhost:8080/tile?z=0&x=0&y=0")
 	http.ListenAndServe(":8080", nil)
+}
+
+func viewHandler(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("../public/index.html")
+	t.Execute(w, 1)
+	if err != nil {
+		log.Println(err)
+	}
 }
