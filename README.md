@@ -18,4 +18,5 @@ sudo apt install gdal-bin libgdal-dev
 - запустите cmd/main.go
 
 ## Проверка работы
-- Запустите файл public/index.html
+- Перейдите по адресу http://localhost:8080/
+- карта должна была инициализироваться
