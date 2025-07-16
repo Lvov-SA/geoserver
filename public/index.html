@@ -1,49 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Тест тайлового сервиса</title>
-    <!-- Подключаем Leaflet CSS и JS -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тайловый просмотрщик</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        body { margin: 0; padding: 0; }
-        #map { height: 100vh; width: 100%; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #map-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        #map {
+            flex-grow: 1;
+            background: #e0e0e0;
+        }
+        .coordinates {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
-    <div id="map"></div>
+    <div id="map-container">
+        <div id="loading">Загрузка данных о карте...</div>
+        <div id="map"></div>
+        <div class="coordinates" id="coordinates">Инициализация...</div>
+    </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Инициализация карты (центр - Москва, zoom 10)
-        const map = L.map('map',{ maxBounds: [[0,0], [1,1]]}).setView([0, 0], 0, );
-
-        // Добавляем слой с вашими тайлами
-        L.tileLayer('http://localhost:8080/tile?z={z}&x={x}&y={y}', {
-            minZoom: 0,
-            maxZoom: 10,
-            attribution: 'Тайловый сервис на Go'
-        }).addTo(map);
-
-        // Кнопка для проверки координат
-        const button = L.control({ position: 'topright' });
-        button.onAdd = function() {
-            this._div = L.DomUtil.create('div', 'info');
-            this.update();
-            return this._div;
-        };
-        button.update = function() {
+        // Глобальные переменные
+        let map;
+        let tileLayer;
+        let imageWidth, imageHeight, tileSize;
+        
+        // Элементы интерфейса
+        const loadingElement = document.getElementById('loading');
+        const coordinatesElement = document.getElementById('coordinates');
+        
+        // 1. Запрашиваем данные о карте с сервера
+        fetch('/image-info')
+            .then(response => response.json())
+            .then(data => {
+                // Получаем параметры карты
+                imageWidth = data.width;
+                imageHeight = data.height;
+                tileSize = data.tileSize || 256;
+                
+                // Инициализируем карту
+                initMap();
+                
+                // Скрываем загрузчик
+                loadingElement.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки данных:', error);
+                loadingElement.textContent = 'Ошибка загрузки данных с сервера';
+            });
+        
+        // 2. Инициализация карты
+        function initMap() {
+            // Создаем карту
+            map = L.map('map', {
+                crs: L.CRS.Simple,
+                minZoom: 0,
+                maxZoom: 6,
+                zoomSnap: 0.25,
+                zoomDelta: 0.25,
+                wheelPxPerZoomLevel: 60,
+                inertia: true
+            });
+            
+            // Рассчитываем границы изображения
+            const pixelOrigin = [0, 0];
+            const southWest = map.unproject(pixelOrigin, 0);
+            const northEast = map.unproject([imageWidth, imageHeight], 0);
+            const bounds = new L.LatLngBounds(southWest, northEast);
+            
+            // Добавляем тайловый слой
+            tileLayer = L.tileLayer('http://localhost:8080/tile?z={z}&x={x}&y={y}', {
+                minZoom: 0,
+                maxZoom: 6,
+                bounds: bounds,
+                noWrap: true,
+                tms: false,
+                errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+            }).addTo(map);
+            
+            // Устанавливаем начальный вид - тайл [0,0,0]
+            const startZoom = 0;
+            const startX = 0;
+            const startY = 0;
+            
+            // Рассчитываем центр для тайла [0,0,0]
+            const tilesAtZoom = Math.pow(2, startZoom);
+            const tileWidth = imageWidth / tilesAtZoom;
+            const tileHeight = imageHeight / tilesAtZoom;
+            
+            const centerX = startX * tileWidth + tileWidth / 2;
+            const centerY = startY * tileHeight + tileHeight / 2;
+            
+            const center = map.unproject([startX, startY], startZoom);
+            map.setView(center, startZoom);
+            
+            // Обновляем информацию
+            updateInfo();
+            
+            // Обработчики событий
+            map.on('moveend', updateInfo);
+            map.on('zoomend', updateInfo);
+        }
+        
+        // 3. Обновление информации о координатах
+        function updateInfo() {
+            if (!map) return;
+            
             const center = map.getCenter();
-            this._div.innerHTML = `
-                <button onclick="alert('Текущий центр: ' + center)">Проверить координаты</button>
-                <p>Zoom: ${map.getZoom()}</p>
-            `;
-        };
-        button.addTo(map);
-
-        // Обновляем данные при изменении карты
-        map.on('moveend', function() {
-            button.update();
-        });
+            const zoom = map.getZoom();
+            
+            // Рассчитываем текущий тайл
+            const scale = Math.pow(2, zoom);
+            const tileX = Math.floor(center.lng * scale / imageWidth * Math.pow(2, zoom));
+            const tileY = Math.floor(center.lat * scale / imageHeight * Math.pow(2, zoom));
+            
+            coordinatesElement.textContent = 
+                `Тайл: [${zoom},${tileX},${tileY}] | ` +
+                `Координаты: [${Math.round(center.lng)}, ${Math.round(center.lat)}] | ` +
+                `Zoom: ${zoom.toFixed(2)}`;
+        }
     </script>
 </body>
 </html>
