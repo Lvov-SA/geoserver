@@ -6,6 +6,6 @@ import (
 
 type User struct {
 	gorm.Model
-	login    string
+	Login    string
 	Passowrd string
 }

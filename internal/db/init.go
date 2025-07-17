@@ -1,15 +1,15 @@
 package db
 
 import (
-	"log"
+	"geoserver/internal/db/models"
+	"geoserver/internal/db/seeds"
 	"os"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-func init() {
+func Init() {
 	dbPath := getDbPath()
 
 	_, err := os.Stat(dbPath)
@@ -26,11 +26,7 @@ func init() {
 }
 
 func getDbPath() string {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	return "../resource" + os.Getenv("DB_DATABASE")
+	return "../resource/" + os.Getenv("DB_DATABASE")
 }
 
 func GetConnection() *gorm.DB {
@@ -45,9 +41,11 @@ func GetConnection() *gorm.DB {
 }
 
 func runMigrate(db *gorm.DB) {
-
+	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Layer{})
+	db.AutoMigrate(&models.Style{})
 }
 
 func runSeed(db *gorm.DB) {
-
+	seeds.User(db)
 }
