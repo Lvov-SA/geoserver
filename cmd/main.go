@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"geoserver/internal/db"
 	"geoserver/internal/handlers"
 	"geoserver/internal/loader"
@@ -24,14 +23,7 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-
-	fmt.Printf(
-		"GeoTIFF info: %dx%d pixels, bands count: %v",
-		loader.Dataset.RasterXSize(),
-		loader.Dataset.RasterXSize(),
-		loader.Dataset.RasterCount(),
-	)
-	fmt.Println()
+	defer loader.Dataset.Close()
 	http.HandleFunc("/", handlers.IndexHandler)
 	http.HandleFunc("/image-info", handlers.ImageInfoHandler)
 	http.HandleFunc("/tile", handlers.TileHandler)

@@ -1,6 +1,7 @@
 package loader
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/lukeroth/gdal"
@@ -15,5 +16,12 @@ func GeoTiff() (gdal.Dataset, error) {
 		log.Fatal("Failed to open GeoTIFF:", err)
 	}
 
+	fmt.Printf(
+		"GeoTIFF info: %dx%d pixels, bands count: %v",
+		Dataset.RasterXSize(),
+		Dataset.RasterXSize(),
+		Dataset.RasterCount(),
+	)
+	fmt.Println()
 	return Dataset, err
 }
