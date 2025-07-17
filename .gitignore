@@ -1,2 +1,4 @@
 /resource/map/*
+/resource
 !resource/map/.gitkeep
+.env
