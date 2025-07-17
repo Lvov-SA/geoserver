@@ -19,7 +19,7 @@ func GeoTiff() (gdal.Dataset, error) {
 	fmt.Printf(
 		"GeoTIFF info: %dx%d pixels, bands count: %v",
 		Dataset.RasterXSize(),
-		Dataset.RasterXSize(),
+		Dataset.RasterYSize(),
 		Dataset.RasterCount(),
 	)
 	fmt.Println()

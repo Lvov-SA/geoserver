@@ -10,7 +10,7 @@ import (
 )
 
 func Init() {
-	dbPath := getDbPath()
+	dbPath := GetDbPath()
 
 	_, err := os.Stat(dbPath)
 	dbExists := !os.IsNotExist(err)
@@ -25,13 +25,13 @@ func Init() {
 	}
 }
 
-func getDbPath() string {
+func GetDbPath() string {
 	return "../resource/" + os.Getenv("DB_DATABASE")
 }
 
 func GetConnection() *gorm.DB {
 
-	dbName := getDbPath()
+	dbName := GetDbPath()
 	db, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
