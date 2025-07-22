@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 const TileSize = 256
@@ -26,19 +27,19 @@ func ImageInfoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func TileHandler(w http.ResponseWriter, r *http.Request) {
-	z, err := strconv.Atoi(r.URL.Query().Get("z"))
+	z, err := strconv.Atoi(r.PathValue("z"))
 	if err != nil || z < 0 {
 		http.Error(w, "Invalid z parameter", http.StatusBadRequest)
 		return
 	}
 
-	x, err := strconv.Atoi(r.URL.Query().Get("x"))
+	x, err := strconv.Atoi(r.PathValue("x"))
 	if err != nil || x < 0 {
 		http.Error(w, "Invalid x parameter", http.StatusBadRequest)
 		return
 	}
-
-	y, err := strconv.Atoi(r.URL.Query().Get("y"))
+	parts := strings.Split(r.PathValue("y"), ".")
+	y, err := strconv.Atoi(parts[0])
 	if err != nil || y < 0 {
 		http.Error(w, "Invalid y parameter", http.StatusBadRequest)
 		return
