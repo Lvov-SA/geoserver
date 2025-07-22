@@ -24,11 +24,12 @@ func main() {
 		panic(err.Error())
 	}
 	defer loader.Dataset.Close()
-	http.HandleFunc("/", handlers.IndexHandler)
-	http.HandleFunc("/image-info", handlers.ImageInfoHandler)
-	http.HandleFunc("/tile", handlers.TileHandler)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", handlers.IndexHandler)
+	mux.HandleFunc("/image-info", handlers.ImageInfoHandler)
+	mux.HandleFunc("GET /tile/{z}/{x}/{y}", handlers.TileHandler)
 
 	log.Println("Server started at :8080")
-	log.Println("Access example: http://localhost:8080/tile?z=0&x=0&y=0")
-	http.ListenAndServe(":8080", nil)
+	log.Println("Access example: http://localhost:8080/tile/0/0/0.png")
+	http.ListenAndServe(":8080", mux)
 }
