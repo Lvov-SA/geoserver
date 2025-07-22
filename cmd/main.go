@@ -23,10 +23,14 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	defer loader.Dataset.Close()
+	//defer loader.Dataset.Close()
 	http.HandleFunc("/", handlers.IndexHandler)
 	http.HandleFunc("/image-info", handlers.ImageInfoHandler)
 	http.HandleFunc("/tile", handlers.TileHandler)
+
+	http.HandleFunc("/wmts/1.0.0/WMTSCapabilities.xml", handlers.GetCapabilitiesHandler)
+	http.HandleFunc("/wmts/1.0.0/tile/", handlers.GetTileHandler)
+	//http.HandleFunc("/wmts/1.0.0/featureinfo/", GetFeatureInfoHandler)
 
 	log.Println("Server started at :8080")
 	log.Println("Access example: http://localhost:8080/tile?z=0&x=0&y=0")

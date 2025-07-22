@@ -18,6 +18,7 @@ func Init() {
 	// 2. Открываем/создаем БД
 	db := GetConnection()
 
+	runMigrate(db)
 	// 3. Если БД не существовала - применяем миграции
 	if !dbExists {
 		runMigrate(db)
@@ -44,6 +45,8 @@ func runMigrate(db *gorm.DB) {
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Layer{})
 	db.AutoMigrate(&models.Style{})
+	db.AutoMigrate(&models.TileMatrix{})
+	db.AutoMigrate(&models.TileMatrixSet{})
 }
 
 func runSeed(db *gorm.DB) {
