@@ -102,7 +102,8 @@ func CliRender(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.
 	}
 	tmpPath := tmpFile.Name()
 	tmpFile.Close()
-	defer os.Remove(tmpPath) // Удаляем в конце
+	defer os.Remove(tmpPath)              // Удаляем в конце
+	defer os.Remove(tmpPath + ".aux.xml") // Удаляем в конце
 	cmd := exec.Command("gdal_translate", "-srcwin",
 		fmt.Sprintf("%d", x*readSize),
 		fmt.Sprintf("%d", y*readSize),
