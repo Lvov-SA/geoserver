@@ -31,5 +31,6 @@ func main() {
 
 	log.Println("Server started at :8080")
 	log.Println("Access example: http://localhost:8080/tile/0/0/0.png")
+	log.Println("Look at map: http://localhost:8080")
 	http.ListenAndServe(":8080", mux)
 }
