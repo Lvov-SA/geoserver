@@ -3,13 +3,59 @@ package render
 import (
 	"fmt"
 	"image"
+	"os"
+	"os/exec"
+	"strconv"
 
 	"github.com/lukeroth/gdal"
 )
 
-func Tile(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) *image.RGBA {
+func GdalTile(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.Image {
 
-	var img *image.RGBA
+	coef := 1 << z
+	maxSize := max(dataset.RasterXSize(), dataset.RasterYSize())
+	readSize := int(float64(maxSize) / float64(coef))
+	fmt.Printf("Размер тайла %v, Размер чтения %v", tileSize, readSize)
+	fmt.Println()
+	// Проверка границ
+	if x*readSize >= maxSize || y*readSize >= maxSize {
+		panic("Проверка границ")
+	}
+	// 2. Настройки для gdal.Translate
+	options := []string{
+		"-srcwin",
+		fmt.Sprintf("%d", x*readSize),
+		fmt.Sprintf("%d", y*readSize),
+		fmt.Sprintf("%d", readSize),
+		fmt.Sprintf("%d", readSize),
+		"-outsize",
+		fmt.Sprintf("%d", tileSize),
+		fmt.Sprintf("%d", tileSize),
+	}
+	fmt.Println(options)
+	// 3. Создаем временный файл
+	zstr := strconv.Itoa(z)
+	ystr := strconv.Itoa(y)
+	xstr := strconv.Itoa(x)
+	outputPath := "../resource/" + zstr + ystr + xstr + ".png"
+
+	// 4. Выполняем преобразование
+	outputDS, err := gdal.Translate(outputPath, dataset, options)
+	if err != nil {
+		return nil
+	}
+
+	defer outputDS.Close()
+	file, err := os.Open(outputPath)
+	if err != nil {
+		panic(err.Error())
+	}
+	imageRGBA, _, _ := image.Decode(file)
+	return imageRGBA
+}
+
+func CustomTile(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.Image {
+
 	coef := 1 << z
 	maxSize := min(dataset.RasterXSize(), dataset.RasterYSize())
 	readSize := int(float64(maxSize) / float64(coef))
@@ -19,33 +65,55 @@ func Tile(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) *image.RGBA
 	if x*readSize >= xSize || y*readSize >= ySize {
 		panic("Проверка границ")
 	}
-
-	img = image.NewRGBA(image.Rect(0, 0, tileSize, tileSize))
-	for b := 0; b < 4 && b < dataset.RasterCount(); b++ { // Первые 4 канала (R,G,B,A)
-		data := make([]uint8, tileSize*tileSize) // Всегда 256x256
-		err := dataset.RasterBand(b+1).IO(
-			gdal.Read,
-			x*readSize, y*readSize, // Смещение в исходном растре
-			readSize, readSize, // Размер считываемой области
-			data,               // Буфер для данных
-			tileSize, tileSize, // Размер выходного тайла
-			0, 0,
-		)
-		if err != nil {
-			panic(err.Error())
-		}
-
-		for i := 0; i < tileSize*tileSize; i++ {
-			img.Pix[i*4+b] = data[i]
-		}
-		fmt.Println("Размер чтения:", readSize)
-		fmt.Println("Первые 10 значений data:", data[:10])
-		fmt.Println("Первые 10 значений img.Pix:", img.Pix[:40])
+	options := []string{
+		"-srcwin",
+		fmt.Sprintf("%d", x*readSize),
+		fmt.Sprintf("%d", y*readSize),
+		fmt.Sprintf("%d", readSize),
+		fmt.Sprintf("%d", readSize),
+		"-outsize",
+		fmt.Sprintf("%d", tileSize),
+		fmt.Sprintf("%d", tileSize),
 	}
-	if dataset.RasterCount() < 4 {
-		for i := 3; i < len(img.Pix); i += 4 {
-			img.Pix[i] = 255
-		}
+	dataset, _ = gdal.Translate("", dataset, options)
+	outputPath := "../resource/tilesss.png"
+	gdal.Translate(outputPath, dataset, nil)
+	file, err := os.Open(outputPath)
+	if err != nil {
+		panic(err.Error())
 	}
-	return img
+	imageRGBA, _, _ := image.Decode(file)
+	return imageRGBA
+}
+
+func CliRender(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.Image {
+	coef := 1 << z
+	maxSize := min(dataset.RasterXSize(), dataset.RasterYSize())
+	readSize := int(float64(maxSize) / float64(coef))
+	fmt.Printf("Размер тайла %v, Размер чтения %v", tileSize, readSize)
+	fmt.Println()
+	if x*readSize >= xSize || y*readSize >= ySize {
+		panic("Проверка границ")
+	}
+	tmpFile, err := os.CreateTemp("../resource", "tile_*.png")
+	if err != nil {
+		panic(err.Error())
+	}
+	tmpPath := tmpFile.Name()
+	tmpFile.Close()
+	defer os.Remove(tmpPath) // Удаляем в конце
+	cmd := exec.Command("gdal_translate", "-srcwin",
+		fmt.Sprintf("%d", x*readSize),
+		fmt.Sprintf("%d", y*readSize),
+		fmt.Sprintf("%d", readSize),
+		fmt.Sprintf("%d", readSize),
+		"-outsize",
+		fmt.Sprintf("%d", tileSize),
+		fmt.Sprintf("%d", tileSize),
+		"../resource/map/geo_map.tif",
+		tmpPath)
+	cmd.Run()
+	file, _ := os.Open(tmpPath)
+	imageRGBA, _, _ := image.Decode(file)
+	return imageRGBA
 }

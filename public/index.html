@@ -90,8 +90,8 @@
                 crs: L.CRS.Simple,
                 minZoom: 0,
                 maxZoom: 6,
-                zoomSnap: 0.25,
-                zoomDelta: 0.25,
+                zoomSnap: 1,
+                zoomDelta: 1,
                 wheelPxPerZoomLevel: 60,
                 inertia: true
             });
@@ -103,9 +103,9 @@
             const bounds = new L.LatLngBounds(southWest, northEast);
             
             // Добавляем тайловый слой
-            tileLayer = L.tileLayer('http://localhost:8080/tile?z={z}&x={x}&y={y}', {
+            tileLayer = L.tileLayer('http://localhost:8080/tile/{z}/{x}/{y}.png', {
                 minZoom: 0,
-                maxZoom: 6,
+                maxZoom: 12,
                 bounds: bounds,
                 noWrap: true,
                 tms: false,
