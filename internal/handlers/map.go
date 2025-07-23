@@ -44,7 +44,7 @@ func TileHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid y parameter", http.StatusBadRequest)
 		return
 	}
-	img := render.Tile(loader.Dataset, TileSize, x, y, z, loader.Dataset.RasterXSize(), loader.Dataset.RasterYSize())
+	img := render.CliRender(loader.Dataset, TileSize, x, y, z, loader.Dataset.RasterXSize(), loader.Dataset.RasterYSize())
 	w.Header().Set("Content-Type", "image/png")
 	if err := png.Encode(w, img); err != nil {
 		log.Printf("PNG encode error: %v", err)
