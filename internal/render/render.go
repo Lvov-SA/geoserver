@@ -3,6 +3,7 @@ package render
 import (
 	"fmt"
 	"image"
+	"math"
 	"os"
 	"os/exec"
 	"strconv"
@@ -87,7 +88,7 @@ func CustomTile(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image
 }
 
 func CliRender(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.Image {
-	coef := 1 << z
+	coef := math.Pow(2, float64(z))
 	maxSize := min(dataset.RasterXSize(), dataset.RasterYSize())
 	readSize := int(float64(maxSize) / float64(coef))
 	fmt.Printf("Размер тайла %v, Размер чтения %v", tileSize, readSize)
