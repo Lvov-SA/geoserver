@@ -1,0 +1,16 @@
+services: 
+  geoserver:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    command:
+    # >
+    #  sh -c "cd cmd && ./app"
+      >  
+      sh -c "cd cmd && go run main.go"
+    ports: 
+      - '${APP_PORT:-8080}:8080'
+    volumes:
+      - ./:/app
