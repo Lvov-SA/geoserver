@@ -6,11 +6,11 @@ services:
     env_file:
       - .env
     command:
-     >
-     sh -c "cd cmd && ./app"
-      # >  
-      # sh -c "cd cmd && go run main.go"
+    #  >
+    #  sh -c "cd cmd && ./app"
+      >  
+      sh -c "cd cmd && go run main.go"
     ports: 
       - '${APP_PORT:-8080}:8080'
-    # volumes:
-    #   - ./:/app
+    volumes:
+      - ./:/app
