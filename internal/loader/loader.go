@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/lukeroth/gdal"
+	"github.com/Lvov-SA/gdal"
 )
 
 var Dataset gdal.Dataset
@@ -16,12 +16,6 @@ func GeoTiff() (gdal.Dataset, error) {
 		log.Fatal("Failed to open GeoTIFF:", err)
 	}
 
-	fmt.Printf(
-		"GeoTIFF info: %dx%d pixels, bands count: %v",
-		Dataset.RasterXSize(),
-		Dataset.RasterXSize(),
-		Dataset.RasterCount(),
-	)
 	fmt.Println()
 	return Dataset, err
 }

@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"strconv"
 
-	"github.com/lukeroth/gdal"
+	"github.com/Lvov-SA/gdal"
 )
 
 func GdalTile(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.Image {
@@ -91,8 +91,6 @@ func CliRender(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.
 	coef := math.Pow(2, float64(z))
 	maxSize := min(dataset.RasterXSize(), dataset.RasterYSize())
 	readSize := int(float64(maxSize) / float64(coef))
-	fmt.Printf("Размер тайла %v, Размер чтения %v", tileSize, readSize)
-	fmt.Println()
 	if x*readSize >= xSize || y*readSize >= ySize {
 		panic("Проверка границ")
 	}
@@ -115,7 +113,14 @@ func CliRender(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.
 		"../resource/map/geo_map.tif",
 		tmpPath)
 	cmd.Run()
-	file, _ := os.Open(tmpPath)
-	imageRGBA, _, _ := image.Decode(file)
+
+	file, err := os.Open(tmpPath)
+	if err != nil {
+		fmt.Printf("%v", err)
+	}
+	imageRGBA, _, err := image.Decode(file)
+	if err != nil {
+		fmt.Printf("%v", err)
+	}
 	return imageRGBA
 }
