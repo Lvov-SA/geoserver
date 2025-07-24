@@ -14,7 +14,7 @@ sudo apt install gdal-bin libgdal-dev
 ```
 
 ## Развертывание
-- Положите файл карты в resource/map/geo_map.tiff
+- Положите файл карты в resource/map/geo_map.tif
 - запустите cmd/main.go
 
 ## Проверка работы
