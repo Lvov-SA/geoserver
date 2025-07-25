@@ -3,89 +3,13 @@ package render
 import (
 	"fmt"
 	"image"
+	"image/png"
 	"math"
 	"os"
 	"os/exec"
-	"strconv"
 
 	"github.com/Lvov-SA/gdal"
 )
-
-func GdalTile(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.Image {
-
-	coef := 1 << z
-	maxSize := max(dataset.RasterXSize(), dataset.RasterYSize())
-	readSize := int(float64(maxSize) / float64(coef))
-	fmt.Printf("Размер тайла %v, Размер чтения %v", tileSize, readSize)
-	fmt.Println()
-	// Проверка границ
-	if x*readSize >= maxSize || y*readSize >= maxSize {
-		panic("Проверка границ")
-	}
-	// 2. Настройки для gdal.Translate
-	options := []string{
-		"-srcwin",
-		fmt.Sprintf("%d", x*readSize),
-		fmt.Sprintf("%d", y*readSize),
-		fmt.Sprintf("%d", readSize),
-		fmt.Sprintf("%d", readSize),
-		"-outsize",
-		fmt.Sprintf("%d", tileSize),
-		fmt.Sprintf("%d", tileSize),
-	}
-	fmt.Println(options)
-	// 3. Создаем временный файл
-	zstr := strconv.Itoa(z)
-	ystr := strconv.Itoa(y)
-	xstr := strconv.Itoa(x)
-	outputPath := "../resource/" + zstr + ystr + xstr + ".png"
-
-	// 4. Выполняем преобразование
-	outputDS, err := gdal.Translate(outputPath, dataset, options)
-	if err != nil {
-		return nil
-	}
-
-	defer outputDS.Close()
-	file, err := os.Open(outputPath)
-	if err != nil {
-		panic(err.Error())
-	}
-	imageRGBA, _, _ := image.Decode(file)
-	return imageRGBA
-}
-
-func CustomTile(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.Image {
-
-	coef := 1 << z
-	maxSize := min(dataset.RasterXSize(), dataset.RasterYSize())
-	readSize := int(float64(maxSize) / float64(coef))
-	fmt.Printf("Размер тайла %v, Размер чтения %v", tileSize, readSize)
-	fmt.Println()
-	// Проверка границ
-	if x*readSize >= xSize || y*readSize >= ySize {
-		panic("Проверка границ")
-	}
-	options := []string{
-		"-srcwin",
-		fmt.Sprintf("%d", x*readSize),
-		fmt.Sprintf("%d", y*readSize),
-		fmt.Sprintf("%d", readSize),
-		fmt.Sprintf("%d", readSize),
-		"-outsize",
-		fmt.Sprintf("%d", tileSize),
-		fmt.Sprintf("%d", tileSize),
-	}
-	dataset, _ = gdal.Translate("", dataset, options)
-	outputPath := "../resource/tilesss.png"
-	gdal.Translate(outputPath, dataset, nil)
-	file, err := os.Open(outputPath)
-	if err != nil {
-		panic(err.Error())
-	}
-	imageRGBA, _, _ := image.Decode(file)
-	return imageRGBA
-}
 
 func CliRender(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.Image {
 	coef := math.Pow(2, float64(z))
@@ -118,7 +42,12 @@ func CliRender(dataset gdal.Dataset, tileSize, x, y, z, xSize, ySize int) image.
 	if err != nil {
 		fmt.Printf("%v", err)
 	}
+	encoder := png.Encoder{
+		CompressionLevel: png.BestCompression, // Максимальное сжатие
+	}
 	imageRGBA, _, err := image.Decode(file)
+	encoder.Encode(file, imageRGBA)
+	imageRGBA, _, err = image.Decode(file)
 	if err != nil {
 		fmt.Printf("%v", err)
 	}
