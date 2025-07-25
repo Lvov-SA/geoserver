@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+	"geoserver/internal/config"
 	"geoserver/internal/db/models"
 	"geoserver/internal/db/seeds"
 	"os"
@@ -9,43 +11,62 @@ import (
 	"gorm.io/gorm"
 )
 
-func Init() {
+func Init() error {
 	dbPath := getDbPath()
 
 	_, err := os.Stat(dbPath)
 	dbExists := !os.IsNotExist(err)
 
 	// 2. Открываем/создаем БД
-	db := GetConnection()
-
+	db, err := GetConnection()
+	if err != nil {
+		return err
+	}
 	// 3. Если БД не существовала - применяем миграции
 	if !dbExists {
-		runMigrate(db)
-		runSeed(db)
+		err = runMigrate(db)
+		if err != nil {
+			return err
+		}
+		err = runSeed(db)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 func getDbPath() string {
-	return "../resource/" + os.Getenv("DB_DATABASE")
+	return "../resource/" + config.Configs.DB_DATABASE
 }
 
-func GetConnection() *gorm.DB {
+func GetConnection() (*gorm.DB, error) {
 
 	dbName := getDbPath()
 	db, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		return nil, fmt.Errorf("Ошибка подклчения к базе данных: %w", err)
 	}
 
-	return db
+	return db, nil
 }
 
-func runMigrate(db *gorm.DB) {
-	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Layer{})
-	db.AutoMigrate(&models.Style{})
+func runMigrate(db *gorm.DB) error {
+	err := db.AutoMigrate(&models.User{})
+	if err != nil {
+		return fmt.Errorf("Ошибка миграции: %w", err)
+	}
+	err = db.AutoMigrate(&models.Layer{})
+	if err != nil {
+		return fmt.Errorf("Ошибка миграции: %w", err)
+	}
+	return nil
 }
 
-func runSeed(db *gorm.DB) {
-	seeds.User(db)
+func runSeed(db *gorm.DB) error {
+	err := seeds.User(db)
+	if err != nil {
+		return fmt.Errorf("Ошибка сида: %w", err)
+	}
+	return nil
 }

@@ -1,17 +1,17 @@
 package handlers
 
 import (
+	"geoserver/internal/config"
 	"html/template"
-	"log"
 	"net/http"
-	"os"
 )
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("../public/index.html")
-	data := struct{ Host string }{Host: os.Getenv("HOST")}
+	data := struct{ Host string }{Host: config.Configs.HOST}
 	t.Execute(w, data)
 	if err != nil {
-		log.Println(err)
+		http.Error(w, "Ошибка загрузки main_page: "+err.Error(), http.StatusBadRequest)
+		return
 	}
 }
