@@ -4,18 +4,15 @@
 Для работы требует предустоновленную библиотеку GDAL на устройстве
 
 ## Настройка окружений
-- Установите GDAL
-```bash
-sudo apt update
-```
-
-```bash 
-sudo apt install gdal-bin libgdal-dev
-```
+- Установите Dcoker
 
 ## Развертывание
+- Создайте .env
 - Положите файл карты в resource/map/geo_map.tif
-- запустите cmd/main.go
+- Выполните команду в корне проекта
+```bash
+docker compose up
+```
 
 ## Проверка работы
 - Перейдите по адресу http://localhost:8080/
