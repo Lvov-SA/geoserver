@@ -1,21 +1,33 @@
 package loader
 
 import (
-	"fmt"
-	"log"
+	"geoserver/internal/db"
+	"geoserver/internal/db/models"
 
 	"github.com/Lvov-SA/gdal"
 )
 
-var Dataset gdal.Dataset
+var Layers map[string]models.Layer
 
-func GeoTiff() (gdal.Dataset, error) {
-	var err error
-	Dataset, err = gdal.Open("../resource/map/geo_map.tif", gdal.ReadOnly)
+func GeoTiff() error {
+	var layers []models.Layer
+	Layers = make(map[string]models.Layer)
+
+	db, err := db.GetConnection()
 	if err != nil {
-		log.Fatal("Failed to open GeoTIFF:", err)
+		return err
 	}
 
-	fmt.Println()
-	return Dataset, err
+	db.Find(&layers)
+	for _, layer := range layers {
+
+		src := "../resource/map/" + layer.SourcePath
+		dataset, err := gdal.Open(src, gdal.ReadOnly)
+		if err != nil {
+			return err
+		}
+		dataset.Close()
+		Layers[layer.Name] = layer
+	}
+	return nil
 }

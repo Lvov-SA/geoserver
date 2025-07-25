@@ -1,36 +1,47 @@
 package main
 
 import (
+	"fmt"
+	"geoserver/internal/config"
 	"geoserver/internal/db"
 	"geoserver/internal/handlers"
 	"geoserver/internal/loader"
 
 	"log"
 	"net/http"
-
-	"github.com/joho/godotenv"
 )
 
 const TileSize = 256
 
 func main() {
-	err := godotenv.Load("../.env")
+
+	err := config.Init()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		fmt.Printf("Ошибка инициализации конфигурации приложения: %v", err)
+		return
 	}
-	db.Init()
-	_, err = loader.GeoTiff()
+	err = db.Init()
 	if err != nil {
-		panic(err.Error())
+		fmt.Printf("Ошибка инициализации базы данных: %v", err)
+		return
 	}
-	defer loader.Dataset.Close()
+	err = loader.GeoTiff()
+	if err != nil {
+		fmt.Printf("Ошибка загрузки данных слоев: %v", err)
+		return
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.IndexHandler)
-	mux.HandleFunc("/image-info", handlers.ImageInfoHandler)
-	mux.HandleFunc("GET /tile/{z}/{x}/{y}", handlers.TileHandler)
+	mux.HandleFunc("GET /{tile}/{z}/{x}/{y}", handlers.TileHandler)
 
 	log.Println("Server started at :8080")
 	log.Println("Access example: http://localhost:8080/tile/0/0/0.png")
 	log.Println("Look at map: http://localhost:8080")
-	http.ListenAndServe(":8080", mux)
+
+	err = http.ListenAndServe(":8080", mux)
+	if err != nil {
+		fmt.Printf("Ошибка запуска сервера: %v", err)
+		return
+	}
 }

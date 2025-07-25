@@ -10,15 +10,14 @@ type Layer struct {
 	Title string `gorm:"size:255;not null"`             // Отображаемое название ("Дороги OSM")
 
 	// Источник данных
-	SourceType string `gorm:"size:50;not null"` // "geotiff", "mbtiles", "postgis"
-	SourcePath string `gorm:"not null"`         // Путь к файлу или DSN
+	SourcePath string `gorm:"not null"` // Путь к файлу в папке resource/map (имя с расшрирением)
 
 	// Настройки видимости
 	MinZoom  int  `gorm:"default:0"`    // Минимальный zoom
-	MaxZoom  int  `gorm:"default:22"`   // Максимальный zoom
+	MaxZoom  int  `gorm:"default:10"`   // Максимальный zoom
 	IsActive bool `gorm:"default:true"` // Доступен для запросов
 
-	// Форматы
-	DefaultFormat    string `gorm:"size:20;default:'image/png'"` // Основной формат тайлов
-	AvailableFormats string `gorm:"type:json"`                   // ["image/png", "image/webp"]
+	Width    int //Ширина исходника
+	Height   int //Высота исходника
+	TileSize int `gorm:"default:256"` //размер тайла для слоя
 }
