@@ -10,9 +10,8 @@ import (
 )
 
 func TileHandler(w http.ResponseWriter, r *http.Request) {
-
 	tileModel, exist := loader.Layers[r.PathValue("tile")]
-	if exist {
+	if !exist {
 		http.Error(w, "Invalid Tile parameter", http.StatusBadRequest)
 		return
 	}
@@ -34,7 +33,7 @@ func TileHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid y parameter", http.StatusBadRequest)
 		return
 	}
-	img, err := render.CliRender(tileModel, x, y, z)
+	img, err := render.CliRender(tileModel, z, x, y)
 	if err != nil || y < 0 {
 		http.Error(w, "Ошибка генерации тайла: "+err.Error(), http.StatusBadRequest)
 		return

@@ -62,27 +62,32 @@
         // Элементы интерфейса
         const loadingElement = document.getElementById('loading');
         const coordinatesElement = document.getElementById('coordinates');
-        
+        imageWidth = 16200;
+                imageHeight = 8100;
+                tileSize = 256;
         // 1. Запрашиваем данные о карте с сервера
-        fetch('/image-info')
-            .then(response => response.json())
-            .then(data => {
-                // Получаем параметры карты
-                imageWidth = data.width;
-                imageHeight = data.height;
-                tileSize = data.tileSize || 256;
+        // fetch('/image-info')
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         // Получаем параметры карты
+        //         imageWidth = data.width;
+        //         imageHeight = data.height;
+        //         tileSize = data.tileSize || 256;
                 
-                // Инициализируем карту
-                initMap();
+        //         // Инициализируем карту
+        //         initMap();
+                
+        //         // Скрываем загрузчик
+        //         loadingElement.style.display = 'none';
+        //     })
+        //     .catch(error => {
+        //         console.error('Ошибка загрузки данных:', error);
+        //         loadingElement.textContent = 'Ошибка загрузки данных с сервера';
+        //     });
+                        initMap();
                 
                 // Скрываем загрузчик
                 loadingElement.style.display = 'none';
-            })
-            .catch(error => {
-                console.error('Ошибка загрузки данных:', error);
-                loadingElement.textContent = 'Ошибка загрузки данных с сервера';
-            });
-        
         // 2. Инициализация карты
         function initMap() {
             // Создаем карту
